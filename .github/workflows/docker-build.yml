@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  FRONTEND_IMAGE: devil/dquiz-frontend
-  BACKEND_IMAGE: devil/dquiz-backend
+  FRONTEND_IMAGE: deviliam/dquiz-frontend
+  BACKEND_IMAGE: deviliam/dquiz-backend
 
 jobs:
 
