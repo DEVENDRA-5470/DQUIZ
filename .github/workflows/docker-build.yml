@@ -11,19 +11,25 @@ jobs:
     outputs:
       frontend_changed: ${{ steps.filter.outputs.frontend }}
       backend_changed: ${{ steps.filter.outputs.backend }}
+      VERSION: ${{ steps.version.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Detect which folders changed
+      - name: Detect changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
           filters: |
             frontend:
-              - 'frontend/**'
+              - "frontend/**"
             backend:
-              - 'backend/**'
+              - "backend/**"
+
+      - name: Generate Auto Version Number
+        id: version
+        run: echo "version=v${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        # v1, v2, v3, auto increments every run
 
 
 
@@ -40,9 +46,15 @@ jobs:
       - name: Build & Push Frontend Image
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
-          docker build -t deviliam/dquiz-frontend:latest -t deviliam/dquiz-frontend:$SHORT_SHA ./frontend
+          VERSION=${{ needs.detect-changes.outputs.VERSION }}
+
+          docker build -t deviliam/dquiz-frontend:${VERSION} \
+                       -t deviliam/dquiz-frontend:sha-${SHORT_SHA} \
+                       -t deviliam/dquiz-frontend:latest ./frontend
+
+          docker push deviliam/dquiz-frontend:${VERSION}
+          docker push deviliam/dquiz-frontend:sha-${SHORT_SHA}
           docker push deviliam/dquiz-frontend:latest
-          docker push deviliam/dquiz-frontend:$SHORT_SHA
 
 
 
@@ -59,6 +71,12 @@ jobs:
       - name: Build & Push Backend Image
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
-          docker build -t deviliam/dquiz-backend:latest -t deviliam/dquiz-backend:$SHORT_SHA ./backend
+          VERSION=${{ needs.detect-changes.outputs.VERSION }}
+
+          docker build -t deviliam/dquiz-backend:${VERSION} \
+                       -t deviliam/dquiz-backend:sha-${SHORT_SHA} \
+                       -t deviliam/dquiz-backend:latest ./backend
+
+          docker push deviliam/dquiz-backend:${VERSION}
+          docker push deviliam/dquiz-backend:sha-${SHORT_SHA}
           docker push deviliam/dquiz-backend:latest
-          docker push deviliam/dquiz-backend:$SHORT_SHA
