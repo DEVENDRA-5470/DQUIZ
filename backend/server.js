@@ -28,3 +28,10 @@ app.listen(process.env.PORT, () => {
     console.log("Server running on port", process.env.PORT);
 });
 
+app.get("/debug/env", (req, res) => {
+    res.json({
+        MONGO_URI: process.env.MONGO_URI,
+        PORT: process.env.PORT,
+        JWT_SECRET: process.env.JWT_SECRET
+    });
+});
