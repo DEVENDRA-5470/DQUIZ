@@ -1,8 +1,11 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# extra packages for Vite builds
+RUN apk add --no-cache python3 make g++
+
 COPY package*.json ./
-RUN npm install          # <── CHANGE HERE
+RUN npm install
 
 COPY . .
 RUN npm run build
