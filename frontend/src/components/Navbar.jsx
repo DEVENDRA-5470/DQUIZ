@@ -64,7 +64,8 @@ export default function Navbar() {
           bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 
           text-transparent bg-clip-text animate-[pulse_2.8s_infinite]
         ">
-          DQuiz djfhjsdkfhsdkjfds
+          DQuiz 
+          i am changing this
         </h1>
 
         <div className="flex gap-10 text-lg">
