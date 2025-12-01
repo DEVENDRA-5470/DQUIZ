@@ -65,7 +65,6 @@ export default function Navbar() {
           text-transparent bg-clip-text animate-[pulse_2.8s_infinite]
         ">
           DQuiz 
-          i am changing this
         </h1>
 
         <div className="flex gap-10 text-lg">
