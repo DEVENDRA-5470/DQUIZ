@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  packages: write  # FIX FOR GHCR
+  packages: write
 
 jobs:
 
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Detect changes in folders
+      - name: Detect changes
         id: filter
         uses: dorny/paths-filter@v3
         with:
@@ -36,6 +36,7 @@ jobs:
         run: echo "version=v${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
 
 
+
   build-frontend:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend_changed == 'true'
@@ -46,29 +47,34 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
 
-      - name: Login to GHCR (Correct FIX)
+      - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build + Push Frontend (DockerHub + GHCR)
+      - name: Build + Push Frontend (Hub + GHCR)
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
           VERSION=${{ needs.detect-changes.outputs.VERSION }}
 
+          # Build image
           docker build -t deviliam/dquiz-frontend:${VERSION} \
                        -t deviliam/dquiz-frontend:sha-${SHORT_SHA} \
                        -t deviliam/dquiz-frontend:latest ./frontend
 
+          # Push DockerHub
           docker push deviliam/dquiz-frontend:${VERSION}
           docker push deviliam/dquiz-frontend:sha-${SHORT_SHA}
           docker push deviliam/dquiz-frontend:latest
 
-          docker tag deviliam/dquiz-frontend:${VERSION} ghcr.io/deviliam/dquiz-frontend:${VERSION}
-          docker tag deviliam/dquiz-frontend:sha-${SHORT_SHA} ghcr.io/deviliam/dquiz-frontend:sha-${SHORT_SHA}
-          docker tag deviliam/dquiz-frontend:latest ghcr.io/deviliam/dquiz-frontend:latest
+          # Tag for GHCR
+          docker tag deviliam/dquiz-frontend:${VERSION} ghcr.io/devendra-5470/dquiz-frontend:${VERSION}
+          docker tag deviliam/dquiz-frontend:sha-${SHORT_SHA} ghcr.io/devendra-5470/dquiz-frontend:sha-${SHORT_SHA}
+          docker tag deviliam/dquiz-frontend:latest ghcr.io/devendra-5470/dquiz-frontend:latest
 
-          docker push ghcr.io/deviliam/dquiz-frontend:${VERSION}
-          docker push ghcr.io/deviliam/dquiz-frontend:sha-${SHORT_SHA}
-          docker push ghcr.io/deviliam/dquiz-frontend:latest
+          # Push GHCR
+          docker push ghcr.io/devendra-5470/dquiz-frontend:${VERSION}
+          docker push ghcr.io/devendra-5470/dquiz-frontend:sha-${SHORT_SHA}
+          docker push ghcr.io/devendra-5470/dquiz-frontend:latest
+
 
 
   build-backend:
@@ -81,10 +87,10 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
 
-      - name: Login to GHCR (Correct FIX)
+      - name: Login GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build + Push Backend (DockerHub + GHCR)
+      - name: Build + Push Backend (Hub + GHCR)
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
           VERSION=${{ needs.detect-changes.outputs.VERSION }}
@@ -93,14 +99,17 @@ jobs:
                        -t deviliam/dquiz-backend:sha-${SHORT_SHA} \
                        -t deviliam/dquiz-backend:latest ./backend
 
+          # Push DockerHub
           docker push deviliam/dquiz-backend:${VERSION}
           docker push deviliam/dquiz-backend:sha-${SHORT_SHA}
           docker push deviliam/dquiz-backend:latest
 
-          docker tag deviliam/dquiz-backend:${VERSION} ghcr.io/deviliam/dquiz-backend:${VERSION}
-          docker tag deviliam/dquiz-backend:sha-${SHORT_SHA} ghcr.io/deviliam/dquiz-backend:sha-${SHORT_SHA}
-          docker tag deviliam/dquiz-backend:latest ghcr.io/deviliam/dquiz-backend:latest
+          # Tag for GHCR
+          docker tag deviliam/dquiz-backend:${VERSION} ghcr.io/devendra-5470/dquiz-backend:${VERSION}
+          docker tag deviliam/dquiz-backend:sha-${SHORT_SHA} ghcr.io/devendra-5470/dquiz-backend:sha-${SHORT_SHA}
+          docker tag deviliam/dquiz-backend:latest ghcr.io/devendra-5470/dquiz-backend:latest
 
-          docker push ghcr.io/deviliam/dquiz-backend:${VERSION}
-          docker push ghcr.io/deviliam/dquiz-backend:sha-${SHORT_SHA}
-          docker push ghcr.io/deviliam/dquiz-backend:latest
+          # Push GHCR
+          docker push ghcr.io/devendra-5470/dquiz-backend:${VERSION}
+          docker push ghcr.io/devendra-5470/dquiz-backend:sha-${SHORT_SHA}
+          docker push ghcr.io/devendra-5470/dquiz-backend:latest
