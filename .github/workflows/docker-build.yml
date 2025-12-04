@@ -113,3 +113,29 @@ jobs:
           docker push ghcr.io/devendra-5470/dquiz-backend:${VERSION}
           docker push ghcr.io/devendra-5470/dquiz-backend:sha-${SHORT_SHA}
           docker push ghcr.io/devendra-5470/dquiz-backend:latest
+
+  deploy-to-kubernetes:
+    needs: [build-backend, build-frontend]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_CONTENT }}" > ~/.kube/config
+
+      - name: Deploy Backend if changed
+        if: needs.detect-changes.outputs.backend_changed == 'true'
+        run: |
+          VERSION=${{ needs.detect-changes.outputs.VERSION }}
+          kubectl set image deployment/backend-deployment backend=deviliam/dquiz-backend:${VERSION}
+
+      - name: Deploy Frontend if changed
+        if: needs.detect-changes.outputs.frontend_changed == 'true'
+        run: |
+          VERSION=${{ needs.detect-changes.outputs.VERSION }}
+          kubectl set image deployment/frontend-deployment frontend=deviliam/dquiz-frontend:${VERSION}
