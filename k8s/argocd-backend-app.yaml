@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dquiz-backend
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image.backend: deviliam/dquiz-backend
+    argocd-image-updater.argoproj.io/backend.update-strategy: semver
+    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^v[0-9]+$
+    argocd-image-updater.argoproj.io/backend.pull-secret: argocd/dockerhub-creds
+    argocd-image-updater.argoproj.io/backend.force-update: "true"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DEVENDRA-5470/DQUIZ-PROD-K8S.git
+    targetRevision: main
+    path: k8s/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
