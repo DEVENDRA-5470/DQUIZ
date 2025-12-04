@@ -115,7 +115,7 @@ jobs:
           docker push ghcr.io/devendra-5470/dquiz-backend:latest
 
   deploy-to-kubernetes:
-    needs: [build-backend, build-frontend]
+    needs: detect-changes
     if: always()
     runs-on: ubuntu-latest
 
