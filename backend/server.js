@@ -17,9 +17,11 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);   // <-- REQUIRED
 
 app.get("/", (req, res) => {
-    res.send("DQuiz API Running");
+    res.send("DQuiz API Backend Running ✅");
+    
 });
 app.get("/api/admin/student-count", getStudentCount);
+
 
 connectDB();
 app.listen(process.env.PORT, () => {
