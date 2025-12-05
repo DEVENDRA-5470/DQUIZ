@@ -5,6 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
+RUN npm set cache /root/.npm --global
 RUN npm install
 
 COPY . .
