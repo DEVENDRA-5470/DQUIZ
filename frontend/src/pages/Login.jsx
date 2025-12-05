@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
+
+  const { login } = useContext(AuthContext);   // ★ IMPORT LOGIN CONTEXT
 
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [email, setEmail] = useState("");
@@ -24,6 +27,7 @@ export default function Login() {
   const debug = (label, data) =>
     console.log(`%c[${label}] =>`, "color:#00e1ff;font-weight:bold;", data);
 
+
   // ================= LOGIN =================
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,25 +35,23 @@ export default function Login() {
     setError(false);
     setErrorMsg("");
 
-    debug("STEP-1 Email Entered", email);
-    debug("STEP-2 Password Entered", password);
-
     try {
       debug("STEP-3 Sending Login Request", { email, password });
 
-      // ★ FIX: no shadowing, no duplicate res variable
       const res = await api.post("/auth/login", { email, password });
       debug("STEP-4 Backend Response", res.data);
 
-      // SUCCESS
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
+      // ★★ AUTH FIX: USE CONTEXT LOGIN() ★★
+      login({
+        token: res.data.token,
+        role: res.data.role,
+        email: res.data.email,
+      });
 
-      debug("STEP-5 Stored Token", res.data.token);
-      debug("STEP-6 Stored Role", res.data.role);
+      debug("STEP-5 LOGIN STORED IN CONTEXT", res.data);
 
       const redirect = location.state?.from ?? res.data.redirect;
-      debug("STEP-7 Redirecting →", redirect);
+      debug("STEP-6 Redirecting →", redirect);
 
       navigate(redirect);
       return;
@@ -68,6 +70,7 @@ export default function Login() {
       className="min-h-screen flex items-center justify-center bg-[#0a0e14] text-white relative overflow-hidden select-none"
     >
 
+      {/* UI BELOW — UNTOUCHED */}
       {/* BACKGROUND LEFT */}
       <motion.div
         animate={{ opacity: [0.28, 0.4, 0.28], scale: [1, 1.12, 1] }}
@@ -120,7 +123,6 @@ export default function Login() {
           text-transparent bg-clip-text tracking-wide
         ">Welcome Back</h1>
 
-        {/* ========== FORM ========== */}
         <form onSubmit={handleLogin} className="space-y-6 font-medium">
 
           <input
