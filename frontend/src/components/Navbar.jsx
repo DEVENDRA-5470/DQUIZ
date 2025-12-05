@@ -1,32 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Navbar() {
-  const [active, setActive] = useState("home");
-  const [isLogged, setIsLogged] = useState(false);
-  const [role, setRole] = useState(null);
 
   const navigate = useNavigate();
-  const location = useLocation();  // CORRECT PLACE
+  const location = useLocation();
 
-  // Re-check login state on every route change (True realtime navbar)
+  const { isLoggedIn, logout, user } = useContext(AuthContext);
+
+  // active nav link UI highlight
+  const [active, setActive] = useState("home");
+
+  // update active state when route changes
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userRole = localStorage.getItem("role");
-
-    setIsLogged(Boolean(token));
-    setRole(userRole);
-
-  }, [location.pathname]);  // NAVBAR REFRESH TRIGGER
+    if (location.pathname.includes("dashboard")) {
+      setActive("dashboard");
+    } else if (location.pathname === "/") {
+      setActive("home");
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    logout();          // clears context + localStorage
     navigate("/login");
-
-    setIsLogged(false);
-    setRole(null);
-    setActive("home");
   };
 
   const NavItem = ({ label, to }) => (
@@ -70,18 +67,19 @@ export default function Navbar() {
         <div className="flex gap-10 text-lg">
           <NavItem label="home" to="/" />
 
-          {isLogged && role === "admin" && (
+          {isLoggedIn && user?.role === "admin" && (
             <NavItem label="dashboard" to="/admin-dashboard" />
           )}
 
-          {isLogged && role === "student" && (
+          {isLoggedIn && user?.role === "student" && (
             <NavItem label="dashboard" to="/student-dashboard" />
           )}
         </div>
 
         {/* BUTTON SECTION */}
         <div className="flex gap-4">
-          {!isLogged ? (
+
+          {!isLoggedIn ? (
             <>
               <Link to="/login">
                 <button className="

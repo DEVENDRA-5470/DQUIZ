@@ -1,7 +1,19 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function StudentDashboard() {
+  const { logout } = useContext(AuthContext);
+const navigate = useNavigate();
+
+function handleLogout() {
+  logout();           // clears context + localStorage
+  navigate("/login"); // redirect user
+}
+
 
   const [pos, setPos] = useState({x:0,y:0});
   const move = e => setPos({
@@ -43,7 +55,13 @@ export default function StudentDashboard() {
           <a className="block px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer">Available Quizzes</a>
           <a className="block px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer">My Attempts</a>
           <a className="block px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer">Profile</a>
-          <a className="block px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer text-red-300">Logout</a>
+      <a 
+  onClick={handleLogout}
+  className="block px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer text-red-300"
+>
+  Logout
+</a>
+
         </nav>
       </aside>
 
