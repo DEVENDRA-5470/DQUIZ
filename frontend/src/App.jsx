@@ -11,40 +11,39 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0a0e14] text-white">
 
-      {/* NAVBAR FIXED = CONTENT NEEDS TOP SPACE */}
       <Navbar />
 
-      {/* This padding removes shake */}
-      <div className="pt-[1px]">  
+      <div className="pt-[1px]">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-  path="/login"
-  element={
-    <AuthRedirect>
-      <Login />
-    </AuthRedirect>
-  }
-/>
           
+          <Route path="/" element={<Home />} />
+
           <Route
-  path="/admin-dashboard"
-  element={
-    <ProtectedRoute allowed={["admin"]}>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-/>
+            path="/login"
+            element={
+              <AuthRedirect>
+                <Login />
+              </AuthRedirect>
+            }
+          />
 
-<Route
-  path="/student-dashboard"
-  element={
-    <ProtectedRoute allowed={["student"]}>
-      <StudentDashboard />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute allowed={["admin"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/student-dashboard"
+            element={
+              <ProtectedRoute allowed={["student"]}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
 
         </Routes>
       </div>

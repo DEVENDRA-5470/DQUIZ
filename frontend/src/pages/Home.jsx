@@ -32,26 +32,31 @@ export default function Home() {
   const handleInput = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // FIXED REGISTER LOGIC (do not touch UI)
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const res = await api.post("/auth/register", form);
 
       console.log("REGISTER RESPONSE →", res.data);
 
-      if (res.ok && data.userId) {
-        setError("");
+      // SUCCESS check for axios
+      if (res.data && res.data.userId) {
         alert("Registration Successful!");
-        navigate("/login");            // REDIRECT ON SUCCESS
-      } else {
-        setError(data.message || "User already exists!");
-        setErrorShake(true);
-        setTimeout(() => setErrorShake(false), 500);
+        navigate("/login");
+        return;
       }
 
-    } catch(err) {
-      setError("Server Error!",err);
+      // If backend returned failure message
+      setError(res.data?.message || "Registration failed!");
+      setErrorShake(true);
+      setTimeout(() => setErrorShake(false), 500);
+
+    } catch (err) {
+      console.error("REGISTER ERROR →", err);
+      setError("Server Error!");
       setErrorShake(true);
       setTimeout(() => setErrorShake(false), 500);
     }

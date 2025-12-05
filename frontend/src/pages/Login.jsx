@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -10,8 +9,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [error, setError] = useState(false);       
-  const [errorMsg, setErrorMsg] = useState("");    
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,49 +21,46 @@ export default function Login() {
     setPos({ x, y });
   };
 
-  // ---------------- LOGGING HELPER ----------------
-  const debug = (label, data) => console.log(`%c[${label}] =>`, "color:#00e1ff;font-weight:bold;", data);
+  const debug = (label, data) =>
+    console.log(`%c[${label}] =>`, "color:#00e1ff;font-weight:bold;", data);
 
   // ================= LOGIN =================
- const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  debug("STEP-1 Email Entered", email);
-  debug("STEP-2 Password Entered", password);
+    setError(false);
+    setErrorMsg("");
 
-  let res;
+    debug("STEP-1 Email Entered", email);
+    debug("STEP-2 Password Entered", password);
 
-  try {
-    debug("STEP-3 Sending Login Request", { email, password });
-  
-    const res = await api.post("/auth/login", { email, password });
-    debug("STEP-4 Backend Response", res.data);
+    try {
+      debug("STEP-3 Sending Login Request", { email, password });
 
-  } catch (err) {
-    debug("STEP-LOGIN FAILED", err.response?.data);
-    setError(true);
-    setErrorMsg(err.response?.data?.message || "Invalid email or password");
-    setTimeout(() => setError(false), 700);
-    return; // STOP HERE — do not continue to redirect
-  }
+      // ★ FIX: no shadowing, no duplicate res variable
+      const res = await api.post("/auth/login", { email, password });
+      debug("STEP-4 Backend Response", res.data);
 
-  // --------- SUCCESS BLOCK (SEPARATED) ----------
-  localStorage.setItem("token", res.data.token);
-  localStorage.setItem("role", res.data.role);
+      // SUCCESS
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
 
-  debug("STEP-5 Stored Token", res.data.token);
-  debug("STEP-6 Stored Role", res.data.role);
+      debug("STEP-5 Stored Token", res.data.token);
+      debug("STEP-6 Stored Role", res.data.role);
 
-  const redirect = location.state?.from ?? res.data.redirect;
-  debug("STEP-7 Redirecting →", redirect);
+      const redirect = location.state?.from ?? res.data.redirect;
+      debug("STEP-7 Redirecting →", redirect);
 
-  try {
-    navigate(redirect);
-  } catch (navErr) {
-    debug("NAVIGATION ERROR", navErr);
-  }
-};
+      navigate(redirect);
+      return;
 
+    } catch (err) {
+      debug("STEP-LOGIN FAILED", err.response?.data);
+      setError(true);
+      setErrorMsg(err.response?.data?.message || "Invalid email or password");
+      setTimeout(() => setError(false), 700);
+    }
+  };
 
   return (
     <div
@@ -107,7 +103,6 @@ export default function Login() {
         `}
       >
         
-        {/* ==== ERROR VISIBLE TOP ==== */}
         {errorMsg && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}

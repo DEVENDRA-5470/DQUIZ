@@ -1,25 +1,27 @@
+import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children, allowed }) {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const { user, isLoggedIn } = useContext(AuthContext);
   const location = useLocation();
 
-  // =========== NOT LOGGED IN =============
-  if (!token || !role) {
+  // ------------------ NOT LOGGED IN ------------------
+  if (!isLoggedIn) {
     return (
-      <Navigate 
+      <Navigate
         to="/login"
         replace
-        state={{ from: location.pathname }}   // store where user was trying to go
+        state={{ from: location.pathname }}
       />
     );
   }
 
-  // =========== ROLE NOT PERMITTED ============
-  if (!allowed.includes(role)) {
-    return <Navigate to={`/${role}-dashboard`} replace />;
+  // ------------------ ROLE NOT ALLOWED ------------------
+  if (allowed && !allowed.includes(user.role)) {
+    return <Navigate to={`/${user.role}-dashboard`} replace />;
   }
 
+  // ------------------ ALLOWED ------------------
   return children;
 }

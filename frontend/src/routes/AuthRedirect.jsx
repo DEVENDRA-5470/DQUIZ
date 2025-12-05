@@ -1,11 +1,13 @@
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function AuthRedirect({ children }) {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const { user, isLoggedIn } = useContext(AuthContext);
 
-  if (token && role) {
-    return <Navigate to={role === "admin" ? "/admin-dashboard" : "/student-dashboard"} replace />;
+  if (isLoggedIn) {
+    const path = user.role === "admin" ? "/admin-dashboard" : "/student-dashboard";
+    return <Navigate to={path} replace />;
   }
 
   return children;
