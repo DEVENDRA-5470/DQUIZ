@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Login() {
 
@@ -35,7 +36,8 @@ export default function Login() {
 
   try {
     debug("STEP-3 Sending Login Request", { email, password });
-    res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+  
+    const res = await api.post("/auth/login", { email, password });
     debug("STEP-4 Backend Response", res.data);
 
   } catch (err) {

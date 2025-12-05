@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 // shake animation preset
 const shakeVariant = {
@@ -35,11 +36,7 @@ export default function Home() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
+      const res = await api.post("/auth/register", form);
 
       const data = await res.json();
       console.log("REGISTER RESPONSE →", data);

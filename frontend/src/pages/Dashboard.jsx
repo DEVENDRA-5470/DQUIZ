@@ -13,7 +13,7 @@ export default function Dashboard() {
   const fetchCounts = async () => {
     try {
       const s = await axios.get(
-        "http://localhost:5000/api/admin/student-count"
+        "http://52.15.78.46:32000/api/admin/student-count"
       );
       setStudents(s.data.count);
 
