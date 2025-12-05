@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../api/axios";
 
 export default function Dashboard() {
   const [students, setStudents] = useState(0);
@@ -12,9 +13,7 @@ export default function Dashboard() {
 
   const fetchCounts = async () => {
     try {
-      const s = await axios.get(
-        "http://52.15.78.46:32000/api/admin/student-count"
-      );
+      const s = await api.get("/admin/student-count");
       setStudents(s.data.count);
 
       // We will fill these later:
