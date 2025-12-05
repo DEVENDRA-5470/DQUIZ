@@ -38,8 +38,7 @@ export default function Home() {
     try {
       const res = await api.post("/auth/register", form);
 
-      const data = await res.json();
-      console.log("REGISTER RESPONSE →", data);
+      console.log("REGISTER RESPONSE →", res.data);
 
       if (res.ok && data.userId) {
         setError("");
@@ -51,8 +50,8 @@ export default function Home() {
         setTimeout(() => setErrorShake(false), 500);
       }
 
-    } catch {
-      setError("Server Error!");
+    } catch(err) {
+      setError("Server Error!",err);
       setErrorShake(true);
       setTimeout(() => setErrorShake(false), 500);
     }
